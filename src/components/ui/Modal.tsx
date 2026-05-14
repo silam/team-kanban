@@ -11,6 +11,8 @@ interface ModalProps {
 
 export function Modal({ title, onClose, children, maxWidth = 'max-w-md' }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     const el = dialogRef.current;
@@ -22,7 +24,7 @@ export function Modal({ title, onClose, children, maxWidth = 'max-w-md' }: Modal
     setTimeout(() => focusables[0]?.focus(), 0);
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { onClose(); return; }
+      if (e.key === 'Escape') { onCloseRef.current(); return; }
       if (e.key === 'Tab' && focusables.length > 0) {
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
@@ -33,7 +35,8 @@ export function Modal({ title, onClose, children, maxWidth = 'max-w-md' }: Modal
 
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [onClose]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
